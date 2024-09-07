@@ -1,27 +1,40 @@
-const express=require('express');
-const bodyparser=require('body-parser');
-const socket=require('socket.io');
+const express = require('express');
+const app = express();
+const PORT = 4000;
 
-const io=new socket.Server({
-    cors:true
+//New imports
+const http = require('http').Server(app);
+const cors = require('cors');
+
+app.use(cors());
+
+const socketIO = require('socket.io')(http, {
+  cors: {
+    origin: "http://localhost:5173"
+  }
 });
-const app=express();
-app.use(bodyparser.json());
-io.on('connection',(socket)=>{
-    console.log('connected');
-    socket.on('join-room',(data)=>{
-        const {roomId,emailId}=data;
-        console.log("Room ID",roomId);
-        console.log("Email Id",emailId);
-        socket.join(roomId);
-        socket.broadcast.to(roomId).emit("User joined",{emailId});
-    })
 
-})
 
-app.listen(8000,()=>{
-    console.log('Server is running on port 8000');
-})
-io.listen(8001,()=>{
-    console.log("Sever is running on port 8001");
+socketIO.on('connection', (socket) => {
+  console.log(`⚡️: ${socket.id} user just connected!`);
+ 
+  socket.on("join_room",(room)=>{
+    socket.join(room);
+    console.log("joined room "+room)
+    socket.emit("room_joined", { room: room, message: `You have successfully joined the room ${room}` });
+  })
+  socket.on('disconnect', () => {
+    console.log('🔥: A user disconnected');
+  });
+});
+
+
+app.get('/api', (req, res) => {
+  res.json({
+    message: 'Hello world',
+  });
+});
+
+http.listen(PORT, () => {
+  console.log(`Server listening on ${PORT}`);
 });

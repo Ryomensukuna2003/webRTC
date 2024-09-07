@@ -1,13 +1,13 @@
-import {React, useContext} from 'react'
-import DynamicInput from './URLinput'
-import { Button } from './ui/button'
+import { React, useContext } from 'react'
+import DynamicInput from '../components/ui/URLinput'
+import { Button } from '../components/ui/button'
 import UserContext from '../Context/userContext'
 
 const Dashboard = () => {
-    const {url}= useContext(UserContext)
-    const redirect_to_url = () => {
-      window.location.href = `http://localhost:5173/${url}`;
-    }
+  const { url } = useContext(UserContext)
+  const redirect_to_url = () => {
+    window.location.href = `http://localhost:5173/${url}`;
+  }
   return (
     <div className='grid justify-items-center w-screen'>
       <DynamicInput />

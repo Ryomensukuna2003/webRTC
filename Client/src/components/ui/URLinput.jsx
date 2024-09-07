@@ -1,5 +1,5 @@
 import { React, useContext, useState } from 'react'
-import UserContext from '../Context/userContext'
+import UserContext from '../../Context/userContext'
 const DynamicUrlInput = () => {
   const { url, setUrl } = useContext(UserContext)
   // const [url, setUrl] = useState('neko');
