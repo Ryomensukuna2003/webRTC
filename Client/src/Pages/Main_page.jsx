@@ -1,13 +1,12 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useSocket } from '../Context/SocketContext';
-import UserContext from '../Context/userContext';
 
 const Main_page = () => {
   const socket = useSocket();
-  const { url } = useContext(UserContext);
+  const url =localStorage.getItem("url"); 
   const [roomJoined, setRoomJoined] = useState(false);
   const [roomMessage, setRoomMessage] = useState('');
-
+  console.log(localStorage.getItem("url"));
   useEffect(() => {
     if (socket) {
       socket.emit("join_room", `${url}`);
@@ -29,7 +28,8 @@ const Main_page = () => {
       ) : (
         <p>Joining room...</p>
       )}
-      
+      <h1>Helloww.. {url}</h1>
+
     </div>
   );
 }
