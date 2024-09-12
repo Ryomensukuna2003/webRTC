@@ -8,7 +8,7 @@ import { PeerProvider } from './Context/Peer.jsx'
 
 
 createRoot(document.getElementById('root')).render(
-  <StrictMode>
+  // <StrictMode>
     <BrowserRouter>
       <SocketProvider>
         <PeerProvider>
@@ -16,5 +16,5 @@ createRoot(document.getElementById('root')).render(
         </PeerProvider>
       </SocketProvider>
     </BrowserRouter>
-  </StrictMode>,
+  // </StrictMode>,
 )

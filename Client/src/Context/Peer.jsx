@@ -1,49 +1,100 @@
-import React, { createContext, useContext, useRef, useCallback } from 'react';
+import React, { createContext, useState, useContext, useEffect, useCallback } from 'react';
+import Peer from 'peerjs';
 
 const PeerContext = createContext();
 
 export const usePeer = () => useContext(PeerContext);
 
 export const PeerProvider = ({ children }) => {
-  const peerRef = useRef(new RTCPeerConnection());
+  const [peer, setPeer] = useState(null);
+  const [peerId, setPeerId] = useState(null);
+  const [connection, setConnection] = useState(null);
+  const [remoteStream, setRemoteStream] = useState(null);
 
-  const createOffer = useCallback(async () => {
-    try {
-      const offer = await peerRef.current.createOffer();
-      await peerRef.current.setLocalDescription(offer);
-      return offer;
-    } catch (error) {
-      console.error("Error creating offer:", error);
-      throw error;
-    }
+  useEffect(() => {
+    const newPeer = new Peer({
+      config: {
+        iceServers: [
+          { urls: 'stun:stun.l.google.com:19302' },
+        ]
+      }
+    });
+
+    newPeer.on('open', (id) => {
+      console.log('My peer ID is: ' + id);
+      setPeerId(id);
+    });
+
+    newPeer.on('error', (error) => {
+      console.error('PeerJS error:', error);
+    });
+
+    setPeer(newPeer);
+
+    return () => {
+      if (newPeer) {
+        newPeer.destroy();
+      }
+    };
   }, []);
 
-  const createAnswer = useCallback(async (offer) => {
-    try {
-      await peerRef.current.setRemoteDescription(new RTCSessionDescription(offer));
-      const answer = await peerRef.current.createAnswer();
-      await peerRef.current.setLocalDescription(answer);
-      return answer;
-    } catch (error) {
-      console.error("Error creating answer:", error);
-      throw error;
-    }
-  }, []);
+  const connectToPeer = useCallback((remotePeerId) => {
+    if (peer) {
+      const conn = peer.connect(remotePeerId);
+      setConnection(conn);
 
-  const setRemoteDescription = useCallback(async (answer) => {
-    try {
-      await peerRef.current.setRemoteDescription(new RTCSessionDescription(answer));
-    } catch (error) {
-      console.error("Error setting remote description:", error);
-      throw error;
+      conn.on('open', () => {
+        console.log('Connected to peer:', remotePeerId);
+      });
+
+      conn.on('data', (data) => {
+        console.log('Received data:', data);
+      });
     }
-  }, []);
+  }, [peer]);
+
+  const sendData = useCallback((data) => {
+    if (connection) {
+      connection.send(data);
+    }
+  }, [connection]);
+
+  const callPeer = useCallback((remotePeerId) => {
+    if (peer) {
+      navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+        .then((stream) => {
+          const call = peer.call(remotePeerId, stream);
+          call.on('stream', (remoteStream) => {
+            setRemoteStream(remoteStream);
+          });
+        })
+        .catch((err) => console.error('Failed to get local stream', err));
+    }
+  }, [peer]);
+
+  useEffect(() => {
+    if (peer) {
+      peer.on('call', (call) => {
+        navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+          .then((stream) => {
+            call.answer(stream);
+            call.on('stream', (remoteStream) => {
+              setRemoteStream(remoteStream);
+            });
+          })
+          .catch((err) => console.error('Failed to get local stream', err));
+      });
+    }
+  }, [peer]);
+  
 
   const value = {
-    peer: peerRef.current,
-    createOffer,
-    createAnswer,
-    setRemoteDescription
+    peer,
+    peerId,
+    connectToPeer,
+    sendData,
+    callPeer,
+    remoteStream
   };
 
   return <PeerContext.Provider value={value}>{children}</PeerContext.Provider>;
