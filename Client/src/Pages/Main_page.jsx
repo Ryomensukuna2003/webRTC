@@ -4,6 +4,7 @@ import { usePeer } from '../Context/Peer'
 import Video from '../components/Video'
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
+import {QRCodeSVG} from 'qrcode.react';
 import { Mic, MicOff, PhoneOff, Video as VideoIcon, VideoOff } from "lucide-react"
 
 const Main_page = () => {
@@ -71,7 +72,6 @@ const Main_page = () => {
   const toggleMute = () => {
     if (localStream && remoteStream) {
       localStream.getAudioTracks().forEach(track => track.enabled = !track.enabled)
-      remoteStream.getAudioTracks().forEach(track => track.enabled = !track.enabled)
       setIsMuted(!isMuted)
     }
   }
@@ -79,7 +79,6 @@ const Main_page = () => {
   const toggleVideo = () => {
     if (localStream && remoteStream) {
       localStream.getVideoTracks().forEach(track => track.enabled = !track.enabled)
-      remoteStream.getVideoTracks().forEach(track => track.enabled = !track.enabled)
       setIsVideoOff(!isVideoOff)
     }
   }
@@ -96,7 +95,7 @@ const Main_page = () => {
                 stream={remoteStream}
                 label="Remote User"
                 muted={false}
-                placeholder="Waiting for other participant..."
+                placeholder={  <QRCodeSVG value={`http://localhost:5173/${url}`} className='w-60 h-60 bg-white p-5'/>}
               />
             </div>
           </div>
@@ -160,7 +159,6 @@ const VideoContainer = ({ stream, label, muted, placeholder }) => (
       {label}
     </div>
   </div>
-
 )
 
 const ControlButton = ({ onClick, active, icon, label }) => (
