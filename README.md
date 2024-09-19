@@ -2,6 +2,52 @@
 
 This project implements a WebRTC-based peer-to-peer connection system, allowing two users to connect directly. It uses Socket.IO for initial room creation and signaling, and PeerJS for establishing WebRTC connections.
 
+# About WebRTC
+
+## Overview
+
+WebRTC (Web Real-Time Communication) is a powerful technology with several key features:
+
+- Stands for Web Real-Time Communication
+- Provides a standardized API (Simple to use)
+- Offers low latency communication
+- Enables peer-to-peer connections
+
+## How WebRTC Works
+
+The process of establishing a WebRTC connection between two peers (let's call them A and B) can be broken down into these steps:
+
+1. **Connection Initiation**
+   - A wants to connect to B
+
+2. **Route Discovery**
+   - A finds every possible route to B
+   - B finds every possible route to A
+
+3. **Signaling**
+   - A and B signal each other their session information
+   - This can be done via various methods:
+     - WhatsApp
+     - QR code
+     - WebSocket
+     - Any other suitable method
+   - This step is known as "Offering"
+
+4. **Connection Establishment**
+   - A connects to B via the most optimal path
+
+5. **Capability Exchange**
+   - A and B share their supported media types and security protocols
+
+6. **Connection Complete**
+   - The WebRTC connection is established and ready for use
+     
+7. **And happy ever after 😊**
+
+This peer-to-peer approach allows for direct, efficient communication between users without requiring intermediary servers for data exchange.
+
+![webRTC](https://github.com/user-attachments/assets/d965b0f7-317c-4ce8-9b84-f7d60e583843)
+
 ## Technologies Used
 
 - Backend:
